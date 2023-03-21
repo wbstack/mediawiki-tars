@@ -1,4 +1,4 @@
-name: packager
+name: Packager
 
 on:
   workflow_dispatch:
@@ -9,13 +9,16 @@ on:
         type: string
         required: true
 
-env:
-  ARCHIVE_NAME: wikibase_${{ inputs.ref }}.tar.gz
-
 jobs:
-  build:
+  package:
     runs-on: ubuntu-latest
     steps:
+      - name: Store timestamp
+        run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Set archive name
+        run: echo "ARCHIVE_NAME=wikibase_${{ env.TIMESTAMP }}_${{ inputs.ref }}.tar.gz" >> $GITHUB_ENV
+
       - name: Check out Wikibase
         uses: actions/checkout@v3
         with:
@@ -27,7 +30,8 @@ jobs:
           fetch-depth: 3
 
       - name: Remove .git related files
-        run: cd ./repos/Wikibase && ( find . -type d -name ".git" && find . -name ".gitignore" && find . -name ".gitmodules" ) | xargs rm -rf
+        run: rm -rf .git .gitignore .gitmodules
+        working-directory: ./repos/Wikibase
 
       - name: Check out this repository
         uses: actions/checkout@v3
@@ -37,7 +41,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create a Wikibase archive file
-        run: cd ./repos && tar -czvf ./release/${{ env.ARCHIVE_NAME }} ./Wikibase
+        run: tar -czvf ./release/${{ env.ARCHIVE_NAME }} ./Wikibase
+        working-directory: ./repos
 
       - name: Commit and push archive
         uses: EndBug/add-and-commit@v9
