@@ -17,7 +17,7 @@ jobs:
         run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
 
       - name: Set archive name
-        run: echo "ARCHIVE_NAME=wikibase_${{ env.TIMESTAMP }}_${{ inputs.ref }}.tar.gz" >> $GITHUB_ENV
+        run: echo "ARCHIVE_NAME=wikibase-${{ env.TIMESTAMP }}-${{ inputs.ref }}.tar.gz" >> $GITHUB_ENV
 
       - name: Check out Wikibase
         uses: actions/checkout@v3
