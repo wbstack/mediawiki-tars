@@ -1,0 +1,53 @@
+name: Packager
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Wikibase ref
+        default: REL1_38
+        type: string
+        required: true
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Store timestamp
+        run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Set archive name
+        run: echo "ARCHIVE_NAME=wikibase_${{ env.TIMESTAMP }}_${{ inputs.ref }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Check out Wikibase
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          repository: wikimedia/mediawiki-extensions-Wikibase
+          path: ./repos/Wikibase
+          ref: ${{ inputs.ref }}
+          # Fetching submodules may fail if "fetch-depth" is too shallow
+          fetch-depth: 3
+
+      - name: Remove .git related files
+        run: rm -rf .git .gitignore .gitmodules
+        working-directory: ./repos/Wikibase
+
+      - name: Check out this repository
+        uses: actions/checkout@v3
+        with:
+          path: ./repos/release
+          # Requires "Read and write permissions" in Actions > General > Workflow permissions
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create a Wikibase archive file
+        run: tar -czvf ./release/${{ env.ARCHIVE_NAME }} ./Wikibase
+        working-directory: ./repos
+
+      - name: Commit and push archive
+        uses: EndBug/add-and-commit@v9
+        with:
+          cwd: ./repos/release
+          message: Add ${{ env.ARCHIVE_NAME }}
+          default_author: github_actions
+          push: true
