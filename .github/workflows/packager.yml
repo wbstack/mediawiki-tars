@@ -41,8 +41,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create a Wikibase archive file
-        run: tar -czvf ./release/${{ env.ARCHIVE_NAME }} ./Wikibase
-        working-directory: ./repos
+        run: tar -czvf ./../release/${{ env.ARCHIVE_NAME }} ./
+        working-directory: ./repos/Wikibase
 
       - name: Commit and push archive
         uses: EndBug/add-and-commit@v9
