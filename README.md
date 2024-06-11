@@ -6,3 +6,8 @@ These tarballs contain Wikibase releases, cloned with submodules but stripped of
 
 ## How to use
 - run the GitHub Action workflow to create a new tarball: https://github.com/wbstack/mediawiki-tars/actions/workflows/packager.yml
+
+## Background
+We tried to use the extension archives distributed by the WMF https://phabricator.wikimedia.org/T361202#9739913
+
+But they don't seem to be kept long enough around for us https://github.com/wbstack/mediawiki/pull/443
